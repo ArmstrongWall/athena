@@ -15,7 +15,12 @@ find_package(LibZip QUIET)
 find_package(Pangolin 0.2 QUIET)
 find_package(OpenCV QUIET)
 
-
+# Add the source in project root directory
+aux_source_directory(. DIRSRCS)
+# Add header file include directories
+include_directories(./ ./localization)
+# Add block directories
+add_subdirectory(src/localization)
 
 # Sources files
 set(ATHENA_SOURCE_FILES
