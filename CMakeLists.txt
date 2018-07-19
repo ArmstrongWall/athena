@@ -1,41 +1,74 @@
-cmake_minimum_required(VERSION 3.10)
-project(Athena)
+cmake_minimum_required(VERSION 3.1)
+project(athena)
+#set(BUILD_TYPE Release)
+set(BUILD_TYPE RelWithDebInfo)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+# flags
+add_definitions("-DENABLE_SSE")
+set(CMAKE_CXX_FLAGS "${SSE_FLAGS} -O3 -fPIC -g -std=c++0x -march=native")
 
 # required libraries
 find_package(SuiteParse REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(OpenCV QUIET)
 find_package(Boost COMPONENTS system thread)
 
 # optional libraries
-find_package(LibZip QUIET)
-find_package(Pangolin 0.2 QUIET)
-find_package(OpenCV QUIET)
+find_package(LibZip REQUIRED)
+find_package(Pangolin 0.2 REQUIRED)
 
-# Add the source in project root directory
-aux_source_directory(. DIRSRCS)
-# Add header file include directories
-include_directories(./ ./localization)
-# Add block directories
-add_subdirectory(src/localization)
 
-# Sources files
-set(ATHENA_SOURCE_FILES
+# Localization Sources files
+set(localization_SOURCE_FILES
         ${PROJECT_SOURCE_DIR}/src/localization/localization.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/FullSystem/FullSystem.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/FullSystem/FullSystemOptimize.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/FullSystem/FullSystemOptPoint.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/FullSystem/FullSystemDebugStuff.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/FullSystem/FullSystemMarginalize.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/FullSystem/Residuals.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/FullSystem/CoarseTracker.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/FullSystem/CoarseInitializer.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/FullSystem/ImmaturePoint.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/FullSystem/HessianBlocks.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/FullSystem/PixelSelector2.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/OptimizationBackend/EnergyFunctional.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/OptimizationBackend/AccumulatedTopHessian.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/OptimizationBackend/AccumulatedSCHessian.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/OptimizationBackend/EnergyFunctionalStructs.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/util/settings.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/util/Undistort.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/util/globalCalib.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/IOWrapper/Pangolin/KeyFrameDisplay.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/IOWrapper/Pangolin/PangolinDSOViewer.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/IOWrapper/OpenCV/ImageDisplay_OpenCV.cpp
+        ${PROJECT_SOURCE_DIR}/src/localization/IOWrapper/OpenCV/ImageRW_OpenCV.cpp
         )
 
+include_directories(
+        ${PROJECT_SOURCE_DIR}/src
+        ${PROJECT_SOURCE_DIR}/src/localization
+        ${PROJECT_SOURCE_DIR}/src/sensor
+        ${PROJECT_SOURCE_DIR}/thirdparty/Sophus
+        ${OpenCV_INCLUDE_DIRS}
+        ${EIGEN3_INCLUDE_DIR}
+        ${CSPARSE_INCLUDE_DIR}
+        ${CHOLMOD_INCLUDE_DIR}
+)
+
+add_library(localization ${localization_SOURCE_FILES})
 
 
-add_executable(Athena src/main.cpp ${ATHENA_SOURCE_FILES})
-target_link_libraries(Athena
+add_executable(athena src/main.cpp)
+target_link_libraries(athena
+        ${OpenCV_LIBS}
+        localization
+        ${PROJECT_SOURCE_DIR}/thirdparty/libBino_Stereo_SDK.so
         boost_system
         boost_thread
         cxsparse
-        ${LIBZIP_LIBRARY}
         ${Pangolin_LIBRARIES}
-        ${OpenCV_LIBS}
-        ${PROJECT_SOURCE_DIR}/thirdparty/libBino_Stereo_SDK.so
         )

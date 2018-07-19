@@ -34,7 +34,7 @@
 
 #include "util/Undistort.h"
 #include "IOWrapper/ImageRW.h"
-#include "util/BinoCamera.h"
+
 
 #if HAS_ZIPLIB
 	#include "zip.h"

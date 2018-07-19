@@ -306,8 +306,7 @@ void PixelSelector::makesemanticMaps(const FrameHessian* const fh,char* semantic
     std::vector<cv::Vec4d> Lines;
     cv::HoughLinesP(CannyImg, Lines, 1, CV_PI / 360, 170,100,15);
 
-    for (auto lines : Lines)
-    {
+    for (auto lines : Lines)  {
         if(lines[0] != lines[2]) {
             for (auto x = static_cast<int>(lines[0]); x < lines[2]; x++) {
                 double k = (lines[1] - lines[3])/(lines[0] - lines[2]);

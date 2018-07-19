@@ -5,7 +5,41 @@
 #ifndef ATHENA_LOCALIZATION_H
 #define ATHENA_LOCALIZATION_H
 
-#include "../sensor/camera/setero_camera.h"
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv/cv.hpp>
+#include <opencv/highgui.h>
+#include <thread>
+#include <locale.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <chrono>
+
+#include <boost/thread.hpp>
+
+#include "IOWrapper/Output3DWrapper.h"
+#include "IOWrapper/ImageDisplay.h"
+
+
+
+#include "util/settings.h"
+#include "util/globalFuncs.h"
+#include "util/DatasetReader.h"
+#include "util/globalCalib.h"
+
+#include "util/NumType.h"
+#include "FullSystem/FullSystem.h"
+#include "OptimizationBackend/MatrixAccumulators.h"
+#include "FullSystem/PixelSelector2.h"
+
+#include "IOWrapper/Pangolin/PangolinDSOViewer.h"
+#include "IOWrapper/OutputWrapper/SampleOutputWrapper.h"
+
+#include "sensor/camera/setero_camera.h"
+
 
 namespace athena {
 namespace localization {
