@@ -21,6 +21,20 @@ find_package(LibZip REQUIRED)
 find_package(Pangolin 0.2 REQUIRED)
 
 
+# glog
+# 这是从caffe中获取的
+#include("cmake/FindGlog.cmake")
+#find_package(lib_glog REQUIRED)
+#include_directories(SYSTEM ${GLOG_INCLUDE_DIRS})
+
+
+# gflags
+# 这是从caffe中获取的
+#include("cmake/FindGFlags.cmake")
+find_package(GFlags REQUIRED)
+#include_directories(SYSTEM ${GFLAGS_INCLUDE_DIRS})
+
+
 # Localization Sources files
 set(localization_SOURCE_FILES
         ${PROJECT_SOURCE_DIR}/src/localization/localization.cpp
@@ -57,6 +71,7 @@ include_directories(
         ${EIGEN3_INCLUDE_DIR}
         ${CSPARSE_INCLUDE_DIR}
         ${CHOLMOD_INCLUDE_DIR}
+        ${GFLAGS_INCLUDE_DIRS}
 )
 
 add_library(localization ${localization_SOURCE_FILES})
@@ -65,10 +80,12 @@ add_library(localization ${localization_SOURCE_FILES})
 add_executable(athena src/main.cpp)
 target_link_libraries(athena
         ${OpenCV_LIBS}
+        ${GFLAGS_LIBRARIES}
         localization
         ${PROJECT_SOURCE_DIR}/thirdparty/libBino_Stereo_SDK.so
         boost_system
         boost_thread
         cxsparse
         ${Pangolin_LIBRARIES}
+
         )

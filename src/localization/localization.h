@@ -39,6 +39,7 @@
 #include "IOWrapper/OutputWrapper/SampleOutputWrapper.h"
 
 #include "sensor/camera/setero_camera.h"
+#include "config/athena_gflags.h"
 
 
 namespace athena {
@@ -50,6 +51,7 @@ public:
     ~Localization() = default;
 
     bool init();
+    void parseArgument();
     void localization_thread_func();
 
 public:
@@ -60,7 +62,9 @@ public:
     bool run_;
 
 private:
-    cv::Mat left,right;
+    std::string source_file_;
+    cv::Mat left_image_,right_image_;
+
 };
 
 }
