@@ -11,7 +11,7 @@ DECLARE_string(unreal_module_name);
 DECLARE_string(unreal_adapter_config_filename);
 
 // data file
-DECLARE_string(unreal_conf_file);
+
 
 // Canbus gflags
 DECLARE_double(chassis_freq);

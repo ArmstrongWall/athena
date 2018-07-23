@@ -1,4 +1,3 @@
-
 #include "athena_gflags.h"
 
 // System gflags

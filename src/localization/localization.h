@@ -19,6 +19,8 @@
 #include <chrono>
 
 #include <boost/thread.hpp>
+#include <gflags/gflags.h>
+#include <config.pb.h>
 
 #include "IOWrapper/Output3DWrapper.h"
 #include "IOWrapper/ImageDisplay.h"
@@ -39,7 +41,6 @@
 #include "IOWrapper/OutputWrapper/SampleOutputWrapper.h"
 
 #include "sensor/camera/setero_camera.h"
-#include "config/athena_gflags.h"
 
 
 namespace athena {
@@ -63,6 +64,7 @@ public:
 
 private:
     std::string source_file_;
+    athena::config::Config config_;
     cv::Mat left_image_,right_image_;
 
 };

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_UNREAL_UTILS_H_
-#define MODULES_UNREAL_UTILS_H_
+#ifndef ATHENA_CONFIG_UTILS_H_
+#define ATHENA_CONFIG_UTILS_H_
 
 #include <string>
 

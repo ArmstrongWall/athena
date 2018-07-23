@@ -3,14 +3,14 @@
 using namespace athena;
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    std::cout << "ATHENA" << std::endl;
 
     std::unique_ptr<localization::Localization> localization;
     localization.reset(new localization::Localization());
 
     localization->init();
 
-    while (1);
+    //while (1);
 
     return 0;
 }

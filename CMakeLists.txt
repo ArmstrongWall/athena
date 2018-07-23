@@ -21,19 +21,21 @@ find_package(LibZip REQUIRED)
 find_package(Pangolin 0.2 REQUIRED)
 
 
+
 # glog
-# 这是从caffe中获取的
 #include("cmake/FindGlog.cmake")
 #find_package(lib_glog REQUIRED)
 #include_directories(SYSTEM ${GLOG_INCLUDE_DIRS})
 
-
 # gflags
-# 这是从caffe中获取的
 #include("cmake/FindGFlags.cmake")
 find_package(GFlags REQUIRED)
 #include_directories(SYSTEM ${GFLAGS_INCLUDE_DIRS})
 
+find_package(Protobuf REQUIRED)
+set(PROTO_FILES
+        src/config/config.proto
+        )
 
 # Localization Sources files
 set(localization_SOURCE_FILES
@@ -62,7 +64,13 @@ set(localization_SOURCE_FILES
         ${PROJECT_SOURCE_DIR}/src/localization/IOWrapper/OpenCV/ImageRW_OpenCV.cpp
         )
 
+
+
+PROTOBUF_GENERATE_CPP(PROTO_SRC PROTO_HDR ${PROTO_FILES})
+
+
 include_directories(
+        ${CMAKE_CURRENT_BINARY_DIR}
         ${PROJECT_SOURCE_DIR}/src
         ${PROJECT_SOURCE_DIR}/src/localization
         ${PROJECT_SOURCE_DIR}/src/sensor
@@ -74,18 +82,21 @@ include_directories(
         ${GFLAGS_INCLUDE_DIRS}
 )
 
+#add_library(config ${config_SOURCE_FILES})
 add_library(localization ${localization_SOURCE_FILES})
 
+add_executable(athena src/main.cpp ${PROTO_SRC} ${PROTO_HDR} ${PROTO_FILES})
 
-add_executable(athena src/main.cpp)
+
 target_link_libraries(athena
         ${OpenCV_LIBS}
-        ${GFLAGS_LIBRARIES}
         localization
         ${PROJECT_SOURCE_DIR}/thirdparty/libBino_Stereo_SDK.so
         boost_system
         boost_thread
         cxsparse
         ${Pangolin_LIBRARIES}
+        gflags
+        ${PROTOBUF_LIBRARIES}
 
         )
