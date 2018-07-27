@@ -1,5 +1,6 @@
 #localization config
 localization_mode_ : "dataset"
+#localization_mode_ = dataset or live
 source_file_: "/home/wzq/git/dataset/uisee/data/00_h0_5m"
 calib_      : "/home/wzq/git/dataset/uisee/data/00_h0_5m/camera.txt"
 

@@ -385,13 +385,10 @@ int main( int argc, char** argv )
 
 
     IOWrap::PangolinDSOViewer* viewer = 0;
-    if(!disableAllDisplay)
-    {
+    if(!disableAllDisplay) {
         viewer = new IOWrap::PangolinDSOViewer(wG[0],hG[0], false);
         fullSystem->outputWrapper.push_back(viewer);
     }
-
-
 
     if(useSampleOutput)
         fullSystem->outputWrapper.push_back(new IOWrap::SampleOutputWrapper());

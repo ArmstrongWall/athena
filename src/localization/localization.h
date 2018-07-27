@@ -52,18 +52,22 @@ public:
 
     bool init();
     void parseArgument();
-    void localization_thread_func();
     void settingsDefault(int preset);
+    std::thread localization_thread_;
+    void localization_live_thread_func();
+    void localization_dataset_thread_func();
 
 public:
     std::unique_ptr<sensor::SeteroCamera> setero_camera_;
     std::string name_;
-    std::thread localization_thread_;
-    // thread run or not
-    bool run_;
+    IOWrap::PangolinDSOViewer* viewer = 0;
 
+    //VO  Config
 private:
     std::string source_file_;
+    std::string calib_;
+    std::string gammaCalib_ ;
+    std::string vignette_;
     athena::config::Config config_;
     cv::Mat left_image_,right_image_;
     float playbackSpeed=0;	// 0 for linearize (play as fast as possible, while sequentializing tracking & mapping). otherwise, factor on timestamps.
@@ -72,6 +76,20 @@ private:
 private:
     bool dataset_init();
     bool live_init();
+
+    //VO
+private:
+    int start = 0;
+    int end   = 100000;
+    bool useSampleOutput=false;
+    // thread run or not
+    bool run_;
+
+    std::unique_ptr<ImageFolderReader> reader;
+    std::unique_ptr<ImageFolderReader> reader_right;
+    std::unique_ptr<FullSystem> fullSystem;
+
+
 
 };
 
