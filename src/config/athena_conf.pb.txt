@@ -1,3 +1,6 @@
-address: "10.0.169.228"
-port: 17771
-timeout_s: 1
+#localization config
+localization_mode_ : "dataset"
+source_file_: "/home/wzq/git/dataset/uisee/data/00_h0_5m"
+calib_      : "/home/wzq/git/dataset/uisee/data/00_h0_5m/camera.txt"
+
+

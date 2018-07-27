@@ -21,11 +21,10 @@
 #include <boost/thread.hpp>
 #include <gflags/gflags.h>
 #include <config.pb.h>
+#include <glog/logging.h>
 
 #include "IOWrapper/Output3DWrapper.h"
 #include "IOWrapper/ImageDisplay.h"
-
-
 
 #include "util/settings.h"
 #include "util/globalFuncs.h"
@@ -41,7 +40,7 @@
 #include "IOWrapper/OutputWrapper/SampleOutputWrapper.h"
 
 #include "sensor/camera/setero_camera.h"
-
+#include "config/until.h"
 
 namespace athena {
 namespace localization {
@@ -54,6 +53,7 @@ public:
     bool init();
     void parseArgument();
     void localization_thread_func();
+    void settingsDefault(int preset);
 
 public:
     std::unique_ptr<sensor::SeteroCamera> setero_camera_;
@@ -66,6 +66,12 @@ private:
     std::string source_file_;
     athena::config::Config config_;
     cv::Mat left_image_,right_image_;
+    float playbackSpeed=0;	// 0 for linearize (play as fast as possible, while sequentializing tracking & mapping). otherwise, factor on timestamps.
+    bool preload=false;
+
+private:
+    bool dataset_init();
+    bool live_init();
 
 };
 

@@ -24,7 +24,7 @@ find_package(Pangolin 0.2 REQUIRED)
 
 # glog
 #include("cmake/FindGlog.cmake")
-#find_package(lib_glog REQUIRED)
+find_package(Glog REQUIRED)
 #include_directories(SYSTEM ${GLOG_INCLUDE_DIRS})
 
 # gflags
@@ -36,6 +36,14 @@ find_package(Protobuf REQUIRED)
 set(PROTO_FILES
         src/config/config.proto
         )
+
+# Config Sources files
+set(config_SOURCE_FILES
+        ${PROJECT_SOURCE_DIR}/src/config/until.cpp)
+
+
+PROTOBUF_GENERATE_CPP(PROTO_SRC PROTO_HDR ${PROTO_FILES})
+
 
 # Localization Sources files
 set(localization_SOURCE_FILES
@@ -66,7 +74,6 @@ set(localization_SOURCE_FILES
 
 
 
-PROTOBUF_GENERATE_CPP(PROTO_SRC PROTO_HDR ${PROTO_FILES})
 
 
 include_directories(
@@ -83,7 +90,7 @@ include_directories(
 )
 
 #add_library(config ${config_SOURCE_FILES})
-add_library(localization ${localization_SOURCE_FILES})
+add_library(localization ${localization_SOURCE_FILES} ${config_SOURCE_FILES})
 
 add_executable(athena src/main.cpp ${PROTO_SRC} ${PROTO_HDR} ${PROTO_FILES})
 
@@ -98,5 +105,5 @@ target_link_libraries(athena
         ${Pangolin_LIBRARIES}
         gflags
         ${PROTOBUF_LIBRARIES}
-
+        glog
         )

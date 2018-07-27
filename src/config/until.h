@@ -24,7 +24,7 @@
 namespace athena {
 namespace until{
 
-bool parse_config_text(const std::string& filename, athena::config::str_list* config);
+bool parse_config_text(const std::string& filename, athena::config::Config* config);
 
 }
 }

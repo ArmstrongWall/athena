@@ -26,7 +26,7 @@ namespace athena {
 namespace until{
 
 
-bool parse_config_text(const std::string& filename, athena::config::str_list* config) {
+bool parse_config_text(const std::string& filename, athena::config::Config* config) {
     int fd = open(filename.c_str(), O_RDONLY);
     if (-1 == fd) {
         return false;

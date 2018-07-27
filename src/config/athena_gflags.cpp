@@ -1,14 +1,7 @@
 #include "athena_gflags.h"
 
-// System gflags
-DEFINE_string(unreal_node_name, "chassis", "The chassis module name in proto");
-DEFINE_string(unreal_module_name, "unreal", "Module name");
-
-DEFINE_string(unreal_adapter_config_filename,
-              "modules/unreal/conf/adapter.conf", "The adapter config file");
-
 // data file
-DEFINE_string(unreal_conf_file, "modules/unreal/conf/unreal_conf.pb.txt",
+DEFINE_string(localization_conf_file, "../src/config/athena_conf.pb.txt",
               "Default unreal conf file");
 
 // Canbus gflags

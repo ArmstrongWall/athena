@@ -1,5 +1,8 @@
 package athena.config;
 
 message Config {
-    optional string source_file_ = 1;
+    optional string localization_mode_ = 1;
+    optional string source_file_ = 2;
+    optional string calib_ = 3;
+
 }
