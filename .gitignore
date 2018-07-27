@@ -1,5 +1,5 @@
 CMakeCache.txt
-CMakeFiles
+CMakeFiles/
 CMakeScripts
 Testing
 Makefile
@@ -10,6 +10,8 @@ CTestTestfile.cmake
 
 !*pb.*
 .idea/
-cmake-build-debug/
 build/
+
+*/athena*
+*.a
 
