@@ -37,12 +37,11 @@ set(PROTO_FILES
         src/config/config.proto
         )
 
+PROTOBUF_GENERATE_CPP(PROTO_SRC PROTO_HDR ${PROTO_FILES})
+
 # Config Sources files
 set(config_SOURCE_FILES
         ${PROJECT_SOURCE_DIR}/src/config/until.cpp)
-
-
-PROTOBUF_GENERATE_CPP(PROTO_SRC PROTO_HDR ${PROTO_FILES})
 
 
 # Localization Sources files
