@@ -60,7 +60,7 @@ bool Localization::init(){
     }
 
     std::string mode_ = config_.localization_mode_().c_str();
-    
+
     if(mode_.compare("dataset")==0) {
         LOG(INFO) << "This is DATASET mode";
         dataset_init();
