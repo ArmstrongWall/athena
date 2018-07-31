@@ -6,7 +6,7 @@ mkdir 3rdparty/
 cd 3rdparty/
 wget https://github.com/opencv/opencv/archive/3.2.0.tar.gz
 tar -xzvf 3.2.0.tar.gz
-cd 3.2.0
+cd opencv-3.2.0
 sudo apt-get install build-essential
 sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
 sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
