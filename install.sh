@@ -19,7 +19,7 @@ sudo make install
 
 #install Pangolin
 cd ~/3rdparty/
-git clone git@github.com:stevenlovegrove/Pangolin.git
+git clone https://github.com/stevenlovegrove/Pangolin.git
 sudo apt-get install libglew-dev
 sudo apt-get install libpython2.7-dev
 sudo apt-get install ffmpeg libavcodec-dev libavutil-dev libavformat-dev libswscale-dev libavdevice-dev
