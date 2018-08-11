@@ -96,13 +96,10 @@ bool Localization::dataset_init() {
     reader->setGlobalCalibration();
     reader_right->setGlobalCalibration();
 
-    if(setting_photometricCalibration > 0 && reader->getPhotometricGamma() == 0)
-    {
+    if(setting_photometricCalibration > 0 && reader->getPhotometricGamma() == 0) {
         printf("ERROR: dont't have photometric calibation. Need to use commandline options mode=1 or mode=2 ");
         exit(1);
     }
-
-
 
     fullSystem.reset(new (std::nothrow) FullSystem());
     if(!fullSystem.get()) {
@@ -125,24 +122,171 @@ bool Localization::dataset_init() {
 }
 
 bool Localization::live_init() {
+
+    paraList_.devPath = "/dev/video1";
+    paraList_.intParameterPath = "thirdparty/params/intrinsics.yml";
+    paraList_.extParameterPath = "thirdparty/params/extrinsics.yml";
+
+
     setero_camera_.reset(new sensor::SeteroCamera());
-    setero_camera_->init();
-}
-
-void Localization::parseArgument() {
-
-}
-
-void Localization::localization_live_thread_func() {
-    while (run_) {
-        setero_camera_->bino->Grab();
-        setero_camera_->bino->getRectImage(left_image_, right_image_);
-        cv::imshow("image_left", left_image_);
-        cv::imshow("image_right", right_image_);
-        cv::waitKey(2);
+    if(!setero_camera_.get()) {
+        LOG(ERROR)<<"Localization Error: setero_camera init failed";
+        return false;
     }
 
-    run_ = false;
+    setero_camera_->init();
+
+    for (int i = 0; i<25; i++) {
+        setero_camera_->bino->Grab();//get img
+        setero_camera_->bino->getRectImage(cv_image_left, cv_image_right);//RectImage
+        cv::waitKey(1);
+    }
+
+    reader.reset(new (std::nothrow) ImageFolderReader(source_file_+"/image_0", calib_, gammaCalib_, vignette_));
+    if(!reader.get()) {
+        LOG(ERROR)<<"Localization Error: reader init failed";
+        return false;
+    }
+
+    reader_right.reset(new (std::nothrow) ImageFolderReader(source_file_+"/image_1", calib_, gammaCalib_, vignette_));
+    if(!reader_right.get()) {
+        LOG(ERROR)<<"Localization Error: reader init failed";
+        return false;
+    }
+
+    reader->setGlobalCalibration();
+    reader_right->setGlobalCalibration();
+
+    if(setting_photometricCalibration > 0 && reader->getPhotometricGamma() == 0) {
+        printf("ERROR: dont't have photometric calibation. Need to use commandline options mode=1 or mode=2 ");
+        exit(1);
+    }
+
+    fullSystem.reset(new (std::nothrow) FullSystem());
+    if(!fullSystem.get()) {
+        LOG(ERROR)<<"Localization Error: fullSystem init failed";
+        return false;
+    }
+
+    fullSystem->setGammaFunction(reader->getPhotometricGamma());
+    fullSystem->linearizeOperation = (playbackSpeed==0);
+
+
+    if(!disableAllDisplay) {
+        viewer = new IOWrap::PangolinDSOViewer(wG[0],hG[0], false);
+        fullSystem->outputWrapper.push_back(viewer);
+    }
+    if(useSampleOutput)
+        fullSystem->outputWrapper.push_back(new IOWrap::SampleOutputWrapper());
+
+    return true;
+
+}
+
+
+void Localization::localization_live_thread_func() {
+
+    //TODO need fix live mode from dataset
+    for(int ii=0; ; ii++) {
+
+        int i = ii;
+
+        ImageAndExposure* img_left;
+        ImageAndExposure* img_right;
+
+
+        setero_camera_->bino->Grab();//get img
+        setero_camera_->bino->getRectImage(cv_image_left, cv_image_right);//RectImage
+        //cv::imshow("image_rect_left", left);
+        //cv::imshow("image_rect_right", right);
+
+        //cv::waitKey(1);
+
+        if(cv_image_left.rows*cv_image_left.cols==0) {
+            printf("cv::imread could not read image %s! this may segfault. \n", reader->files[i].c_str());
+            return ;
+        }
+        if(cv_image_left.type() != CV_8U) {
+            printf("cv::imread did something strange! this may segfault. \n");
+            return ;
+        }
+        MinimalImageB* img = new MinimalImageB(cv_image_left.cols, cv_image_left.rows);
+        memcpy(img->data, cv_image_left.data, cv_image_left.rows*cv_image_left.cols);
+
+        img_left = reader->undistort->undistort<unsigned char>(img,1, 0, 1.0f);
+
+        delete img;
+
+        //cv::Mat cv_image_right = right;
+
+        if(cv_image_right.rows*cv_image_right.cols==0) {
+            printf("cv::imread could not read image %s! this may segfault. \n", reader_right->files[i].c_str());
+            return ;
+        }
+        if(cv_image_right.type() != CV_8U) {
+            printf("cv::imread did something strange! this may segfault. \n");
+            return ;
+        }
+        MinimalImageB* img_r = new MinimalImageB(cv_image_right.cols, cv_image_right.rows);
+        memcpy(img_r->data, cv_image_right.data, cv_image_right.rows*cv_image_right.cols);
+
+        img_right = reader_right->undistort->undistort<unsigned char>(img_r,1, 0, 1.0f);
+
+        delete img_r;
+
+        // if MODE_SLAM is true, it runs slam.
+        bool MODE_SLAM = true;
+        // if MODE_STEREOMATCH is true, it does stereo matching and output idepth image.
+        bool MODE_STEREOMATCH = false;
+
+        if(MODE_SLAM) {
+            fullSystem->addActiveFrame(img_left, img_right, i);
+        }
+
+        if(MODE_STEREOMATCH) {
+            std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
+
+            cv::Mat idepthMap(img_left->h, img_left->w, CV_32FC3, cv::Scalar(0,0,0));
+            cv::Mat &idepth_temp = idepthMap;
+            fullSystem->stereoMatch(img_left, img_right, i, idepth_temp);
+
+            std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+            double ttStereoMatch = std::chrono::duration_cast<std::chrono::duration<double>>(t1 -t0).count();
+            std::cout << " casting time " << ttStereoMatch << std::endl;
+        }
+        delete img_left;
+        delete img_right;
+
+        // initializer fail
+        if(fullSystem->initFailed || setting_fullResetRequested) {
+            if(ii < 250 || setting_fullResetRequested) {
+                printf("RESETTING!\n");
+
+                std::vector<IOWrap::Output3DWrapper*> wraps = fullSystem->outputWrapper;
+                fullSystem.release();
+
+                for(IOWrap::Output3DWrapper* ow : wraps) ow->reset();
+
+                fullSystem.reset(new (std::nothrow) FullSystem());
+                fullSystem->setGammaFunction(reader->getPhotometricGamma());
+                fullSystem->linearizeOperation = (playbackSpeed==0);
+
+
+                fullSystem->outputWrapper = wraps;
+
+                setting_fullResetRequested=false;
+            }
+        }
+
+        if(fullSystem->isLost)  {
+            printf("LOST!!\n");
+            break;
+        }
+
+    }
+
+    fullSystem->blockUntilMappingIsFinished();
+    fullSystem->printResult("/home/wzq/result.txt");
 
 }
 

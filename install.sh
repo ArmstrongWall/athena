@@ -43,8 +43,7 @@ sudo apt-get install -y libsuitesparse-dev libeigen3-dev libboost-all-dev
 
 
 cd ~/git/athena
-mkdir build
-cd build
+cd cmake-build-debug/
 cmake ..
 make -j7
 
